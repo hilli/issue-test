@@ -53,7 +53,7 @@ func (c *IssuesClient) GetOpenIssues(nwo, labels string) []models.Issueable {
 
 	issuesList, err := c.client.Issues().WithUrl("https://api.github.com/repos/"+nwo+"/issues").Get(context.Background(), issuesRequestConfig)
 	if err != nil {
-		log.Fatalf("error getting issues: %v", err)
+		log.Fatalf("error getting issues: %v\n", err)
 	}
 	return issuesList
 }
@@ -63,11 +63,12 @@ func (c *IssuesClient) GetIssue(owner, repo, labels string) []models.Issueable {
 		QueryParameters: &repos.ItemItemIssuesRequestBuilderGetQueryParameters{
 			Labels: &labels,
 		},
+		Headers: c.headers,
 	}
 
 	issues, err := c.client.Repos().ByOwnerId(owner).ByRepoId(repo).Issues().Get(context.Background(), req)
 	if err != nil {
-		log.Fatalf("error getting issues: %v", err.Error())
+		log.Fatalf("error getting issues: %+v\n", err)
 	}
 	return issues
 }
