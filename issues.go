@@ -73,22 +73,28 @@ func (c *IssuesClient) GetIssue(owner, repo, labels string) []models.Issueable {
 	return issues
 }
 
-func (c *IssuesClient) GetStargazers(owner, repo string) {
-	var zero int32 = 0
-	var hundred int32 = 100
-	stargazersReq := &abs.RequestConfiguration[repos.ItemItemStargazersRequestBuilderGetQueryParameters]{
-		QueryParameters: &repos.ItemItemStargazersRequestBuilderGetQueryParameters{
-			Per_page: &hundred,
-			Page:     &zero,
-		},
-		Headers: c.headers,
+func (c *IssuesClient) CreateIssue(owner, repo, title, body string, labels []string) models.Issueable {
+	// newIssue := models.NewIssue()
+	// newIssue.SetLabels(labels)
+	// newIssue.SetTitle(&title)
+	// newIssue.SetBody(&body)
+
+	newTitle := repos.NewItemItemIssuesPostRequestBody_IssuesPostRequestBody_title()
+	newTitle.SetString(&title)
+
+	newIssue := repos.NewItemItemIssuesPostRequestBody()
+	newIssue.SetLabels(labels)
+	newIssue.SetTitle(newTitle)
+	newIssue.SetBody(&body)
+
+	req := &abs.RequestConfiguration[abs.DefaultQueryParameters]{
+		QueryParameters: &abs.DefaultQueryParameters{},
+		Headers:         c.headers,
 	}
 
-	stargazers, err := c.client.Repos().ByOwnerId(owner).ByRepoId(repo).Stargazers().Get(context.Background(), stargazersReq)
+	issue, err := c.client.Repos().ByOwnerId(owner).ByRepoId(repo).Issues().Post(context.Background(), newIssue, req)
 	if err != nil {
-		log.Fatalf("error getting stargazers: %v", err.Error())
+		log.Fatalf("error creating issue: %+v\n", err)
 	}
-	sgz := stargazers.GetItemItemStargazersStargazer()
-	log.Printf("Stargazers: %+v", sgz)
-
+	return issue
 }

@@ -23,7 +23,9 @@ func TestGetIssue(t *testing.T) {
 	}
 }
 
-func TestGetStargazers(t *testing.T) {
+func TestCreateIssue(t *testing.T) {
 	client := NewClient()
-	client.GetStargazers("hilli", "issue-test")
+	issue := client.CreateIssue("hilli", "issue-test", "New issue", "New issue body", []string{"DSR-Request"})
+
+	t.Logf("Issue: %s", issue)
 }
