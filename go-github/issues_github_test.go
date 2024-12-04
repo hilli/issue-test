@@ -82,3 +82,36 @@ func TestCreateComment(t *testing.T) {
 		t.Fatalf("error creating comment: %v", err)
 	}
 }
+
+func TestIssueCommentExists(t *testing.T) {
+	client := NewClient()
+	issue, err := client.CreateIssue(owner, repo, "New issue", "New issue body", []string{"comment-issue", "testing"})
+	if err != nil {
+		t.Fatalf("error creating issue: %v", err)
+	}
+
+	t.Logf("Issue: %s", issue.GetURL())
+
+	// Create a comment
+	err = client.CommentIssue(owner, repo, issue.GetNumber(), "This is a comment")
+	if err != nil {
+		t.Fatalf("error creating comment: %v", err)
+	}
+
+	// Check if the comment exists
+	exists, err := client.IssueCommentExists(owner, repo, issue.GetNumber(), "This is a comment")
+	if err != nil {
+		t.Fatalf("error checking if comment exists: %v", err)
+	}
+	if !exists {
+		t.Fatalf("comment does not exist")
+	}
+
+	notExists, err := client.IssueCommentExists(owner, repo, issue.GetNumber(), "This is a comment")
+	if err != nil {
+		t.Fatalf("error checking if comment exists: %v", err)
+	}
+	if !notExists {
+		t.Fatalf("comment does exist. It should not.")
+	}
+}

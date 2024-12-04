@@ -70,3 +70,17 @@ func (c *IssuesClient) CommentIssue(owner, repo string, number int, comment stri
 	})
 	return err
 }
+
+func (c *IssuesClient) IssueCommentExists(owner, repo string, number int, comment string) (bool, error) {
+	comments, _, err := c.client.Issues.ListComments(context.Background(), owner, repo, number, &github.IssueListCommentsOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	for _, issueComment := range comments {
+		if *issueComment.Body == comment {
+			return true, nil
+		}
+	}
+	return false, nil
+}
